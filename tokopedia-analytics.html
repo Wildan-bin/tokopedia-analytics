@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tokopedia Analysis Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      :root {
+        --primary-green: #03ac0e;
+        --secondary-green: #42b549;
+        --light-green: #d6ffde;
+        --dark-green: #016b09;
+        --bg-color: #f3f4f5;
+        --card-bg: #ffffff;
+        --text-primary: #2c3e50;
+        --text-secondary: #6d7588;
+        --danger: #e74c3c;
+        --warning: #f1c40f;
+        --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --radius-md: 12px;
+        --radius-lg: 16px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Nunito Sans", sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Container Query Context */
+      .app-container {
+        container-type: inline-size;
+        container-name: dashboard;
+        width: 100%;
+        background-color: var(--bg-color);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Header */
+      header {
+        background-color: var(--card-bg);
+        padding: 1rem 1.5rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 3px solid var(--primary-green);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .brand i {
+        font-size: 1.5rem;
+        color: var(--primary-green);
+      }
+
+      .brand h1 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--primary-green);
+        letter-spacing: -0.5px;
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .user-info {
+        text-align: right;
+        display: none;
+      }
+
+      .user-info span {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+      }
+
+      .user-info strong {
+        font-size: 0.9rem;
+      }
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--light-green);
+      }
+
+      /* Main Layout */
+      main {
+        padding: 1.5rem;
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: 1fr;
+      }
+
+      /* KPI Section */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+
+      .kpi-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-md);
+        padding: 1.25rem;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-left: 4px solid var(--primary-green);
+        transition: transform 0.2s ease;
+      }
+
+      .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .kpi-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+      }
+
+      .kpi-icon {
+        width: 36px;
+        height: 36px;
+        background-color: var(--light-green);
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--dark-green);
+      }
+
+      .kpi-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+      }
+
+      .kpi-label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+      }
+
+      .trend-badge {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .trend-up {
+        background: #e6fffa;
+        color: var(--primary-green);
+      }
+      .trend-down {
+        background: #fff5f5;
+        color: var(--danger);
+      }
+
+      /* Strategy Sections */
+      .strategy-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .section-header {
+        margin-bottom: 0.5rem;
+      }
+
+      .section-header h2 {
+        font-size: 1.1rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .section-header h2::before {
+        content: "";
+        display: block;
+        width: 4px;
+        height: 1.2rem;
+        background-color: var(--primary-green);
+        border-radius: 2px;
+      }
+
+      .section-desc {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+        margin-left: 0.75rem;
+      }
+
+      /* Charts & Cards */
+      .chart-card {
+        background: var(--card-bg);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .chart-card h3 {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        font-weight: 700;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 250px;
+        width: 100%;
+      }
+
+      /* Strategy 3: Top Products List */
+      .product-list {
+        list-style: none;
+      }
+
+      .product-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .product-item:last-child {
+        border-bottom: none;
+      }
+
+      .product-rank {
+        font-weight: 800;
+        color: var(--secondary-green);
+        width: 30px;
+      }
+
+      .product-img {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        background: #eee;
+        margin-right: 1rem;
+        object-fit: cover;
+      }
+
+      .product-details {
+        flex: 1;
+      }
+
+      .product-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .product-stats {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+      }
+
+      .stat-highlight {
+        color: var(--primary-green);
+        font-weight: 700;
+      }
+
+      /* Container Query Response */
+      @container dashboard (min-width: 600px) {
+        .kpi-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+
+        .user-info {
+          display: block;
+        }
+      }
+
+      @container dashboard (min-width: 900px) {
+        main {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* Make strategy sections span full width or stay in grid depending on content */
+        .strategy-section-full {
+          grid-column: span 2;
+        }
+
+        .dashboard-grid-upper {
+          grid-column: span 2;
+          display: grid;
+          grid-template-columns: 2fr 1fr; /* Charts take more space */
+          gap: 1.5rem;
+        }
+
+        .dashboard-grid-lower {
+          grid-column: span 2;
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 1.5rem;
+        }
+
+        .chart-card-tall {
+          height: 100%;
+        }
+      }
+
+      /* Utility for Recommendations Badge */
+      .badge-rec {
+        background-color: var(--warning);
+        color: #fff;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        margin-left: 0.5rem;
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Header -->
+      <header>
+        <div class="brand">
+          <i class="fas fa-chart-pie"></i>
+          <h1>Tokopedia Analysis</h1>
+        </div>
+        <div class="user-profile">
+          <div class="user-info">
+            <strong>Business Admin</strong>
+            <span>Analytics Team</span>
+          </div>
+          <img
+            src="https://placehold.co/100x100/42b549/ffffff?text=AD"
+            alt="Admin Avatar"
+            id="user-avatar"
+            class="avatar"
+          />
+        </div>
+      </header>
+
+      <main>
+        <!-- KPI Cards -->
+        <div class="strategy-section-full kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Active Sessions</span>
+              <div class="kpi-icon"><i class="fas fa-users"></i></div>
+            </div>
+            <div class="kpi-value">128,405</div>
+            <div class="trend-badge trend-up">
+              <i class="fas fa-arrow-up"></i> 12% vs last week
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Conversion Rate</span>
+              <div class="kpi-icon"><i class="fas fa-shopping-cart"></i></div>
+            </div>
+            <div class="kpi-value">4.2%</div>
+            <div class="trend-badge trend-up">
+              <i class="fas fa-arrow-up"></i> 0.8%
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Avg Session</span>
+              <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+            </div>
+            <div class="kpi-value">6m 12s</div>
+            <div class="trend-badge trend-down">
+              <i class="fas fa-arrow-down"></i> 15s
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Total Revenue</span>
+              <div class="kpi-icon"><i class="fas fa-wallet"></i></div>
+            </div>
+            <div class="kpi-value">$8.2M</div>
+            <div class="trend-badge trend-up">
+              <i class="fas fa-arrow-up"></i> 5.4%
+            </div>
+          </div>
+        </div>
+
+        <!-- Strategy 1: User Behavior -->
+        <section class="strategy-section dashboard-grid-upper">
+          <div class="chart-card">
+            <div class="section-header">
+              <h2>Session & Logout Analysis</h2>
+              <p class="section-desc">
+                Correlating session duration with checkout probability & dropout
+                points.
+              </p>
+            </div>
+            <div class="chart-container">
+              <canvas id="sessionChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>Dropout Points</h3>
+            <div class="chart-container">
+              <canvas id="dropoutChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- Strategy 2: Personalization -->
+        <section class="strategy-section dashboard-grid-lower">
+          <div class="chart-card">
+            <div class="section-header">
+              <h2>Engagement Metrics</h2>
+              <p class="section-desc">
+                Correlations for personalized notifications.
+              </p>
+            </div>
+            <div class="chart-container">
+              <canvas id="radarChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>Category Affinity</h3>
+            <div class="chart-container">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+          <div
+            class="chart-card"
+            style="
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+            "
+          >
+            <h3>Notification Relevance Score</h3>
+            <div style="text-align: center; margin-bottom: 1rem">
+              <i
+                class="fas fa-bell"
+                style="
+                  font-size: 3rem;
+                  color: var(--primary-green);
+                  margin-bottom: 1rem;
+                "
+              ></i>
+              <div
+                style="
+                  font-size: 2.5rem;
+                  font-weight: 800;
+                  color: var(--text-primary);
+                "
+              >
+                92/100
+              </div>
+              <p style="color: var(--text-secondary); font-size: 0.9rem">
+                Relevance based on browsing history & flash sales.
+              </p>
+            </div>
+            <div
+              style="
+                background: #f0fdf4;
+                padding: 1rem;
+                border-radius: 8px;
+                border: 1px dashed var(--primary-green);
+              "
+            >
+              <strong
+                style="
+                  color: var(--dark-green);
+                  display: block;
+                  margin-bottom: 0.5rem;
+                "
+                ><i class="fas fa-lightbulb"></i> Insight</strong
+              >
+              <span style="font-size: 0.85rem; color: var(--dark-green)"
+                >Users who view flash sales are 3x more likely to click
+                notifications about similar categories.</span
+              >
+            </div>
+          </div>
+        </section>
+
+        <!-- Strategy 3: Product Demand -->
+        <section class="strategy-section strategy-section-full">
+          <div class="section-header">
+            <h2>High Volume Product Demand & Anomalies</h2>
+            <p class="section-desc">
+              Analysis of products purchased >1000 times weekly.
+            </p>
+          </div>
+
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+              gap: 1.5rem;
+            "
+          >
+            <!-- Demand Anomalies Chart -->
+            <div class="chart-card">
+              <h3>Weekly Demand Anomalies</h3>
+              <div class="chart-container">
+                <canvas id="anomalyChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Top Products List -->
+            <div class="chart-card chart-card-tall">
+              <h3>
+                Recommended High-Demand Products
+                <span class="badge-rec">Hot</span>
+              </h3>
+              <ul class="product-list">
+                <li class="product-item">
+                  <span class="product-rank">1</span>
+                  <img
+                    src="https://placehold.co/48x48/42b549/ffffff?text=P1"
+                    alt="Product 1"
+                    id="prod-img-1"
+                    class="product-img"
+                  />
+                  <div class="product-details">
+                    <div class="product-name">Wireless Earbuds Pro</div>
+                    <div class="product-stats">
+                      <span
+                        >Weekly:
+                        <span class="stat-highlight">12,450</span></span
+                      >
+                      <span style="color: var(--primary-green)"
+                        >+15% Demand</span
+                      >
+                    </div>
+                  </div>
+                </li>
+                <li class="product-item">
+                  <span class="product-rank">2</span>
+                  <img
+                    src="https://placehold.co/48x48/42b549/ffffff?text=P2"
+                    alt="Product 2"
+                    id="prod-img-2"
+                    class="product-img"
+                  />
+                  <div class="product-details">
+                    <div class="product-name">Smart Home Hub</div>
+                    <div class="product-stats">
+                      <span
+                        >Weekly: <span class="stat-highlight">8,320</span></span
+                      >
+                      <span style="color: var(--primary-green)"
+                        >+8% Demand</span
+                      >
+                    </div>
+                  </div>
+                </li>
+                <li class="product-item">
+                  <span class="product-rank">3</span>
+                  <img
+                    src="https://placehold.co/48x48/42b549/ffffff?text=P3"
+                    alt="Product 3"
+                    id="prod-img-3"
+                    class="product-img"
+                  />
+                  <div class="product-details">
+                    <div class="product-name">Ergo Office Chair</div>
+                    <div class="product-stats">
+                      <span
+                        >Weekly: <span class="stat-highlight">5,100</span></span
+                      >
+                      <span style="color: var(--warning)"
+                        >Anomaly Detected</span
+                      >
+                    </div>
+                  </div>
+                </li>
+                <li class="product-item">
+                  <span class="product-rank">4</span>
+                  <img
+                    src="https://placehold.co/48x48/42b549/ffffff?text=P4"
+                    alt="Product 4"
+                    id="prod-img-4"
+                    class="product-img"
+                  />
+                  <div class="product-details">
+                    <div class="product-name">Mechanical Keyboard</div>
+                    <div class="product-stats">
+                      <span
+                        >Weekly: <span class="stat-highlight">3,800</span></span
+                      >
+                      <span>Stable</span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      (function () {
+        // Chart 1: Session Duration vs Checkout Probability (Strategy 1)
+        const ctxSession = document
+          .getElementById("sessionChart")
+          .getContext("2d");
+        new Chart(ctxSession, {
+          type: "line",
+          data: {
+            labels: ["0-2m", "2-5m", "5-10m", "10-20m", "20m+"],
+            datasets: [
+              {
+                label: "Checkout Probability (%)",
+                data: [5, 12, 45, 30, 15],
+                borderColor: "#03AC0E",
+                backgroundColor: "rgba(3, 172, 14, 0.1)",
+                fill: true,
+                tension: 0.4,
+              },
+              {
+                label: "Avg Session Volume (k)",
+                data: [50, 80, 40, 20, 10],
+                borderColor: "#F1C40F",
+                borderDash: [5, 5],
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: "bottom" },
+            },
+          },
+        });
+
+        // Chart 2: Logout/Dropout Pages (Strategy 1)
+        const ctxDropout = document
+          .getElementById("dropoutChart")
+          .getContext("2d");
+        new Chart(ctxDropout, {
+          type: "bar",
+          data: {
+            labels: ["Home", "Search", "Details", "Cart", "Payment"],
+            datasets: [
+              {
+                label: "Logout Frequency",
+                data: [1500, 2200, 3100, 4500, 800],
+                backgroundColor: [
+                  "#D6FFDE",
+                  "#D6FFDE",
+                  "#42b549",
+                  "#03AC0E", // Highest dropout at Cart
+                  "#D6FFDE",
+                ],
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } },
+          },
+        });
+
+        // Chart 3: Personalization Radar (Strategy 2)
+        const ctxRadar = document.getElementById("radarChart").getContext("2d");
+        new Chart(ctxRadar, {
+          type: "radar",
+          data: {
+            labels: [
+              "Purchase History",
+              "View Freq",
+              "Flash Sale Click",
+              "Fav Category",
+              "Cart Add",
+            ],
+            datasets: [
+              {
+                label: "Current User Cluster",
+                data: [85, 90, 75, 95, 80],
+                fill: true,
+                backgroundColor: "rgba(3, 172, 14, 0.2)",
+                borderColor: "#03AC0E",
+                pointBackgroundColor: "#03AC0E",
+              },
+              {
+                label: "Avg User",
+                data: [50, 45, 30, 40, 45],
+                fill: true,
+                backgroundColor: "rgba(109, 117, 136, 0.1)",
+                borderColor: "#6D7588",
+                pointBackgroundColor: "#6D7588",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { r: { suggesteMin: 0, suggestedMax: 100 } },
+          },
+        });
+
+        // Chart 4: Category Affinity (Strategy 2)
+        const ctxCategory = document
+          .getElementById("categoryChart")
+          .getContext("2d");
+        new Chart(ctxCategory, {
+          type: "doughnut",
+          data: {
+            labels: ["Electronics", "Fashion", "Home", "Beauty"],
+            datasets: [
+              {
+                data: [45, 25, 20, 10],
+                backgroundColor: ["#03AC0E", "#42b549", "#82e0aa", "#D6FFDE"],
+                borderWidth: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: "right" } },
+          },
+        });
+
+        // Chart 5: Demand Anomalies (Strategy 3)
+        const ctxAnomaly = document
+          .getElementById("anomalyChart")
+          .getContext("2d");
+        new Chart(ctxAnomaly, {
+          type: "line",
+          data: {
+            labels: ["W1", "W2", "W3", "W4", "W5", "W6"],
+            datasets: [
+              {
+                label: "Product Demand (Thousands)",
+                data: [12, 14, 13, 28, 15, 16], // Spike at W4
+                borderColor: "#2C3E50",
+                segment: {
+                  borderColor: (ctx) =>
+                    ctx.p0.parsed.y > 20 || ctx.p1.parsed.y > 20
+                      ? "#E74C3C"
+                      : "#2C3E50",
+                  borderWidth: (ctx) =>
+                    ctx.p0.parsed.y > 20 || ctx.p1.parsed.y > 20 ? 4 : 2,
+                },
+                tension: 0.3,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    return context.parsed.y + "k Purchases";
+                  },
+                },
+              },
+            },
+          },
+        });
+      })();
+    </script>
+  </body>
+</html>

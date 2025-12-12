@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tokopedia Analysis Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'tokped-primary': '#03ac0e',
+              'tokped-secondary': '#42b549',
+              'tokped-light': '#d6ffde',
+              'tokped-dark': '#016b09',
+              'tokped-bg': '#f3f4f5',
+              'tokped-text': '#2c3e50',
+              'tokped-muted': '#6d7588',
+            },
+            fontFamily: {
+              nunito: ['"Nunito Sans"', 'sans-serif'],
+            },
+          },
+        },
+      }
+    </script>
+    <style>
+      /* Container queries - not yet fully supported in Tailwind CDN */
+      .app-container {
+        container-type: inline-size;
+        container-name: dashboard;
+      }
+
+      @container dashboard (min-width: 600px) {
+        .kpi-grid {
+          grid-template-columns: repeat(4, 1fr) !important;
+        }
+        .user-info-container {
+          display: block !important;
+        }
+      }
+
+      @container dashboard (min-width: 900px) {
+        .main-grid {
+          grid-template-columns: repeat(2, 1fr) !important;
+        }
+        .strategy-section-full {
+          grid-column: span 2;
+        }
+        .dashboard-grid-upper {
+          grid-column: span 2;
+          display: grid !important;
+          grid-template-columns: 2fr 1fr !important;
+          gap: 1.5rem;
+        }
+        .dashboard-grid-lower {
+          grid-column: span 2;
+          display: grid !important;
+          grid-template-columns: 1fr 1fr 1fr !important;
+          gap: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body class="font-nunito bg-tokped-bg text-tokped-text antialiased m-0 p-0 box-border">
+    <div class="app-container w-full bg-tokped-bg min-h-screen flex flex-col">
+      <!-- Header -->
+      <header class="bg-white px-6 py-4 sticky top-0 z-50 shadow-sm flex justify-between items-center border-b-[3px] border-tokped-primary">
+        <div class="flex items-center gap-3">
+          <i class="fas fa-chart-pie text-2xl text-tokped-primary"></i>
+          <h1 class="text-xl font-extrabold text-tokped-primary tracking-tight">Tokopedia Analysis</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="user-info-container hidden text-right">
+            <strong class="text-sm block">Business Admin</strong>
+            <span class="text-xs text-tokped-muted block">Analytics Team</span>
+          </div>
+          <img
+            src="https://placehold.co/100x100/42b549/ffffff?text=AD"
+            alt="Admin Avatar"
+            id="user-avatar"
+            class="w-10 h-10 rounded-full object-cover border-2 border-tokped-light"
+          />
+        </div>
+      </header>
+
+      <main class="main-grid px-24 p-6 grid gap-6 grid-cols-1">
+        <!-- KPI Cards -->
+        <div class="kpi-grid strategy-section-full grid grid-cols-2 gap-4">
+          <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-tokped-primary flex flex-col justify-between hover:-translate-y-0.5 hover:shadow-md transition-transform">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-sm text-tokped-muted font-semibold">Active Sessions</span>
+              <div class="w-9 h-9 bg-tokped-light rounded-lg flex justify-center items-center text-tokped-dark">
+                <i class="fas fa-users"></i>
+              </div>
+            </div>
+            <div class="text-2xl font-extrabold text-tokped-text">128,405</div>
+            <div class="text-xs px-1.5 py-0.5 rounded bg-emerald-50 text-tokped-primary font-bold inline-flex items-center gap-1 w-fit">
+              <i class="fas fa-arrow-up"></i> 12% vs last week
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-tokped-primary flex flex-col justify-between hover:-translate-y-0.5 hover:shadow-md transition-transform">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-sm text-tokped-muted font-semibold">Conversion Rate</span>
+              <div class="w-9 h-9 bg-tokped-light rounded-lg flex justify-center items-center text-tokped-dark">
+                <i class="fas fa-shopping-cart"></i>
+              </div>
+            </div>
+            <div class="text-2xl font-extrabold text-tokped-text">4.2%</div>
+            <div class="text-xs px-1.5 py-0.5 rounded bg-emerald-50 text-tokped-primary font-bold inline-flex items-center gap-1 w-fit">
+              <i class="fas fa-arrow-up"></i> 0.8%
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-tokped-primary flex flex-col justify-between hover:-translate-y-0.5 hover:shadow-md transition-transform">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-sm text-tokped-muted font-semibold">Avg Session</span>
+              <div class="w-9 h-9 bg-tokped-light rounded-lg flex justify-center items-center text-tokped-dark">
+                <i class="fas fa-clock"></i>
+              </div>
+            </div>
+            <div class="text-2xl font-extrabold text-tokped-text">6m 12s</div>
+            <div class="text-xs px-1.5 py-0.5 rounded bg-red-50 text-red-500 font-bold inline-flex items-center gap-1 w-fit">
+              <i class="fas fa-arrow-down"></i> 15s
+            </div>
+          </div>
+          <div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-tokped-primary flex flex-col justify-between hover:-translate-y-0.5 hover:shadow-md transition-transform">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-sm text-tokped-muted font-semibold">Total Revenue</span>
+              <div class="w-9 h-9 bg-tokped-light rounded-lg flex justify-center items-center text-tokped-dark">
+                <i class="fas fa-wallet"></i>
+              </div>
+            </div>
+            <div class="text-2xl font-extrabold text-tokped-text">$8.2M</div>
+            <div class="text-xs px-1.5 py-0.5 rounded bg-emerald-50 text-tokped-primary font-bold inline-flex items-center gap-1 w-fit">
+              <i class="fas fa-arrow-up"></i> 5.4%
+            </div>
+          </div>
+        </div>
+
+        <!-- Strategy 1: User Behavior -->
+        <section class="dashboard-grid-upper flex flex-col gap-6">
+          <div class="bg-white rounded-2xl p-6 shadow-sm overflow-hidden">
+            <div class="mb-2">
+              <h2 class="text-lg text-tokped-text flex items-center gap-2">
+                <span class="block w-1 h-5 bg-tokped-primary rounded"></span>
+                Session & Logout Analysis
+              </h2>
+              <p class="text-sm text-tokped-muted mt-1 ml-3">
+                Correlating session duration with checkout probability & dropout points.
+              </p>
+            </div>
+            <div class="relative h-64 w-full">
+              <canvas id="sessionChart"></canvas>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 shadow-sm overflow-hidden">
+            <h3 class="text-base mb-4 text-tokped-text font-bold">Dropout Points</h3>
+            <div class="relative h-64 w-full">
+              <canvas id="dropoutChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- Strategy 2: Personalization -->
+        <section class="dashboard-grid-lower flex flex-col gap-6">
+          <div class="bg-white rounded-2xl p-6 shadow-sm overflow-hidden">
+            <div class="mb-2">
+              <h2 class="text-lg text-tokped-text flex items-center gap-2">
+                <span class="block w-1 h-5 bg-tokped-primary rounded"></span>
+                Engagement Metrics
+              </h2>
+              <p class="text-sm text-tokped-muted mt-1 ml-3">
+                Correlations for personalized notifications.
+              </p>
+            </div>
+            <div class="relative h-64 w-full">
+              <canvas id="radarChart"></canvas>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 shadow-sm overflow-hidden">
+            <h3 class="text-base mb-4 text-tokped-text font-bold">Category Affinity</h3>
+            <div class="relative h-64 w-full">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl p-6 shadow-sm overflow-hidden flex flex-col justify-center">
+            <h3 class="text-base mb-4 text-tokped-text font-bold">Notification Relevance Score</h3>
+            <div class="text-center mb-4">
+              <i class="fas fa-bell text-5xl text-tokped-primary mb-4"></i>
+              <div class="text-4xl font-extrabold text-tokped-text">92/100</div>
+              <p class="text-tokped-muted text-sm">
+                Relevance based on browsing history & flash sales.
+              </p>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg border border-dashed border-tokped-primary">
+              <strong class="text-tokped-dark block mb-2">
+                <i class="fas fa-lightbulb"></i> Insight
+              </strong>
+              <span class="text-sm text-tokped-dark">
+                Users who view flash sales are 3x more likely to click notifications about similar categories.
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Strategy 3: Product Demand -->
+        <section class="strategy-section-full flex flex-col gap-6">
+          <div class="mb-2">
+            <h2 class="text-lg text-tokped-text flex items-center gap-2">
+              <span class="block w-1 h-5 bg-tokped-primary rounded"></span>
+              High Volume Product Demand & Anomalies
+            </h2>
+            <p class="text-sm text-tokped-muted mt-1 ml-3">
+              Analysis of products purchased >1000 times weekly.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6">
+            <!-- Demand Anomalies Chart -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm overflow-hidden">
+              <h3 class="text-base mb-4 text-tokped-text font-bold">Weekly Demand Anomalies</h3>
+              <div class="relative h-64 w-full">
+                <canvas id="anomalyChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Top Products List -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm overflow-hidden h-full">
+              <h3 class="text-base mb-4 text-tokped-text font-bold">
+                Recommended High-Demand Products
+                <span class="bg-yellow-400 text-white px-2 py-0.5 rounded-full text-[0.7rem] font-bold ml-2 uppercase">Hot</span>
+              </h3>
+              <ul class="list-none">
+                <li class="flex items-center py-4 border-b border-gray-100">
+                  <span class="font-extrabold text-tokped-secondary w-8">1</span>
+                  <img
+                    src="https://placehold.co/48x48/42b549/ffffff?text=P1"
+                    alt="Product 1"
+                    id="prod-img-1"
+                    class="w-12 h-12 rounded-lg bg-gray-100 mr-4 object-cover"
+                  />
+                  <div class="flex-1">
+                    <div class="font-bold text-[0.95rem] mb-1">Wireless Earbuds Pro</div>
+                    <div class="flex justify-between text-sm text-tokped-muted">
+                      <span>Weekly: <span class="text-tokped-primary font-bold">12,450</span></span>
+                      <span class="text-tokped-primary">+15% Demand</span>
+                    </div>
+                  </div>
+                </li>
+                <li class="flex items-center py-4 border-b border-gray-100">
+                  <span class="font-extrabold text-tokped-secondary w-8">2</span>
+                  <img
+                    src="https://placehold.co/48x48/42b549/ffffff?text=P2"
+                    alt="Product 2"
+                    id="prod-img-2"
+                    class="w-12 h-12 rounded-lg bg-gray-100 mr-4 object-cover"
+                  />
+                  <div class="flex-1">
+                    <div class="font-bold text-[0.95rem] mb-1">Smart Home Hub</div>
+                    <div class="flex justify-between text-sm text-tokped-muted">
+                      <span>Weekly: <span class="text-tokped-primary font-bold">8,320</span></span>
+                      <span class="text-tokped-primary">+8% Demand</span>
+                    </div>
+                  </div>
+                </li>
+                <li class="flex items-center py-4 border-b border-gray-100">
+                  <span class="font-extrabold text-tokped-secondary w-8">3</span>
+                  <img
+                    src="https://placehold.co/48x48/42b549/ffffff?text=P3"
+                    alt="Product 3"
+                    id="prod-img-3"
+                    class="w-12 h-12 rounded-lg bg-gray-100 mr-4 object-cover"
+                  />
+                  <div class="flex-1">
+                    <div class="font-bold text-[0.95rem] mb-1">Ergo Office Chair</div>
+                    <div class="flex justify-between text-sm text-tokped-muted">
+                      <span>Weekly: <span class="text-tokped-primary font-bold">5,100</span></span>
+                      <span class="text-yellow-400">Anomaly Detected</span>
+                    </div>
+                  </div>
+                </li>
+                <li class="flex items-center py-4">
+                  <span class="font-extrabold text-tokped-secondary w-8">4</span>
+                  <img
+                    src="https://placehold.co/48x48/42b549/ffffff?text=P4"
+                    alt="Product 4"
+                    id="prod-img-4"
+                    class="w-12 h-12 rounded-lg bg-gray-100 mr-4 object-cover"
+                  />
+                  <div class="flex-1">
+                    <div class="font-bold text-[0.95rem] mb-1">Mechanical Keyboard</div>
+                    <div class="flex justify-between text-sm text-tokped-muted">
+                      <span>Weekly: <span class="text-tokped-primary font-bold">3,800</span></span>
+                      <span>Stable</span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      (function () {
+        // Chart 1: Session Duration vs Checkout Probability (Strategy 1)
+        const ctxSession = document
+          .getElementById("sessionChart")
+          .getContext("2d");
+        new Chart(ctxSession, {
+          type: "line",
+          data: {
+            labels: ["0-2m", "2-5m", "5-10m", "10-20m", "20m+"],
+            datasets: [
+              {
+                label: "Checkout Probability (%)",
+                data: [5, 12, 45, 30, 15],
+                borderColor: "#03AC0E",
+                backgroundColor: "rgba(3, 172, 14, 0.1)",
+                fill: true,
+                tension: 0.4,
+              },
+              {
+                label: "Avg Session Volume (k)",
+                data: [50, 80, 40, 20, 10],
+                borderColor: "#F1C40F",
+                borderDash: [5, 5],
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: "bottom" },
+            },
+          },
+        });
+
+        // Chart 2: Logout/Dropout Pages (Strategy 1)
+        const ctxDropout = document
+          .getElementById("dropoutChart")
+          .getContext("2d");
+        new Chart(ctxDropout, {
+          type: "bar",
+          data: {
+            labels: ["Home", "Search", "Details", "Cart", "Payment"],
+            datasets: [
+              {
+                label: "Logout Frequency",
+                data: [1500, 2200, 3100, 4500, 800],
+                backgroundColor: [
+                  "#D6FFDE",
+                  "#D6FFDE",
+                  "#42b549",
+                  "#03AC0E",
+                  "#D6FFDE",
+                ],
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } },
+          },
+        });
+
+        // Chart 3: Personalization Radar (Strategy 2)
+        const ctxRadar = document.getElementById("radarChart").getContext("2d");
+        new Chart(ctxRadar, {
+          type: "radar",
+          data: {
+            labels: [
+              "Purchase History",
+              "View Freq",
+              "Flash Sale Click",
+              "Fav Category",
+              "Cart Add",
+            ],
+            datasets: [
+              {
+                label: "Current User Cluster",
+                data: [85, 90, 75, 95, 80],
+                fill: true,
+                backgroundColor: "rgba(3, 172, 14, 0.2)",
+                borderColor: "#03AC0E",
+                pointBackgroundColor: "#03AC0E",
+              },
+              {
+                label: "Avg User",
+                data: [50, 45, 30, 40, 45],
+                fill: true,
+                backgroundColor: "rgba(109, 117, 136, 0.1)",
+                borderColor: "#6D7588",
+                pointBackgroundColor: "#6D7588",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { r: { suggesteMin: 0, suggestedMax: 100 } },
+          },
+        });
+
+        // Chart 4: Category Affinity (Strategy 2)
+        const ctxCategory = document
+          .getElementById("categoryChart")
+          .getContext("2d");
+        new Chart(ctxCategory, {
+          type: "doughnut",
+          data: {
+            labels: ["Electronics", "Fashion", "Home", "Beauty"],
+            datasets: [
+              {
+                data: [45, 25, 20, 10],
+                backgroundColor: ["#03AC0E", "#42b549", "#82e0aa", "#D6FFDE"],
+                borderWidth: 0,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: "right" } },
+          },
+        });
+
+        // Chart 5: Demand Anomalies (Strategy 3)
+        const ctxAnomaly = document
+          .getElementById("anomalyChart")
+          .getContext("2d");
+        new Chart(ctxAnomaly, {
+          type: "line",
+          data: {
+            labels: ["W1", "W2", "W3", "W4", "W5", "W6"],
+            datasets: [
+              {
+                label: "Product Demand (Thousands)",
+                data: [12, 14, 13, 28, 15, 16],
+                borderColor: "#2C3E50",
+                segment: {
+                  borderColor: (ctx) =>
+                    ctx.p0.parsed.y > 20 || ctx.p1.parsed.y > 20
+                      ? "#E74C3C"
+                      : "#2C3E50",
+                  borderWidth: (ctx) =>
+                    ctx.p0.parsed.y > 20 || ctx.p1.parsed.y > 20 ? 4 : 2,
+                },
+                tension: 0.3,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    return context.parsed.y + "k Purchases";
+                  },
+                },
+              },
+            },
+          },
+        });
+      })();
+    </script>
+  </body>
+</html>
