@@ -25,3 +25,6 @@ Bash
 
 	cd tokopedia-analytics
 Peninjauan File: Buka file utama (misal: index.html atau file terkait) menggunakan peramban web atau code editor untuk menganalisis kode sumber dan hasil generatif AI tersebut.
+
+**THIS WEBSITE ALREADY ONLINE**
+https://wildan-bin.github.io/tokopedia-analytics/
