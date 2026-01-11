@@ -18,10 +18,10 @@ Eksekusi Terminal: Buka terminal atau command prompt pada direktori kerja Anda, 
 
 Bash
 
-git clone https://github.com/Wildan-bin/tokopedia-analytics.git
+	git clone https://github.com/Wildan-bin/tokopedia-analytics.git
 Akses Direktori: Masuk ke dalam folder proyek untuk meninjau struktur file:
 
 Bash
 
-cd tokopedia-analytics
+	cd tokopedia-analytics
 Peninjauan File: Buka file utama (misal: index.html atau file terkait) menggunakan peramban web atau code editor untuk menganalisis kode sumber dan hasil generatif AI tersebut.
